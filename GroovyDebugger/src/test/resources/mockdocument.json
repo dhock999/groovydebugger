@@ -1,0 +1,42 @@
+{
+	"processProperties": [
+		{
+			"propName": "DPPName1",
+			"propValue": "DPPValue1"
+		},
+		{
+			"propName": "DPPName2",
+			"propValue": "DPPValue2"
+		}
+	],
+	"documents": [
+		{
+			"docIndex": 0,
+			"docContents": "Document 1",
+			"documentProperties": [
+				{
+					"propName": "DDPName1",
+					"propValue": "DDPValue1"
+				},
+				{
+					"propName": "DDPName2",
+					"propValue": "DDPValue2"
+				}
+			]
+		},
+		{
+			"docIndex": 1,
+			"docContents": "Document 2",
+			"documentProperties": [
+				{
+					"propName": "DDPName1",
+					"propValue": "DDPValue1"
+				},
+				{
+					"propName": "DDPName2",
+					"propValue": "DDPValue2"
+				}
+			]
+		}
+	]
+}
