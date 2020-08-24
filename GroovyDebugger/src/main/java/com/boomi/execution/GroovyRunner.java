@@ -3,75 +3,160 @@ package com.boomi.execution;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.boomi.execution.DataContextImpl;
 import com.boomi.execution.ExecutionUtilNonStatic;
 import com.manywho.services.atomsphere.actions.groovymapscriptrunner.MapScriptIOItem;
+import com.manywho.services.atomsphere.actions.groovyprocessscriptrunner.PropertyItem;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
 public class GroovyRunner {
+    private Logger logger;
 
 	String stdout;
 	String actualDocs;
+	DataContextImpl dataContext;
+	String returnDocument="";
+	List<PropertyItem> returnDocumentProperties = new ArrayList<PropertyItem>();
+	List<PropertyItem> returnProcessProperties  = new ArrayList<PropertyItem>();
+	
+	public GroovyRunner()
+	{
+		logger = Logger.getLogger(this.getClass().getName());
+	}
+	public void runProcessScript(String scriptText, String document, List<PropertyItem> documentProperties, List<PropertyItem> processProperties)
+	{
+		JSONObject inputDocs = new JSONObject();
+		JSONArray documentsArray = new JSONArray();
+		inputDocs.put("documents", documentsArray);
+		JSONObject documentObject = new JSONObject();
+		documentsArray.put(documentObject);
+		documentObject.put("docContents", document);
+		documentObject.put("docIndex", 0);
+		JSONArray processPropertiesArray = new JSONArray();
+		inputDocs.put("processProperties", processPropertiesArray);
+		JSONArray documentPropertiesArray = new JSONArray();
+		documentObject.put("documentProperties", documentPropertiesArray);
+
+		for(PropertyItem item:documentProperties)
+		{
+			JSONObject property = new JSONObject();
+			documentPropertiesArray.put(property);
+			property.put("propName", item.getName());
+			property.put("propValue", item.getValue());
+		}
+		
+		for(PropertyItem item:processProperties)
+		{
+			JSONObject property = new JSONObject();
+			processPropertiesArray.put(property);
+			property.put("propName", item.getName());
+			property.put("propValue", item.getValue());
+		}
+
+		logger.info("inputDocs: " + inputDocs.toString(2));
+		dataContext = new DataContextImpl(inputDocs);
+
+		Binding binding = new Binding();
+		if (runGroovy(binding, scriptText))
+		{	
+			JSONObject actualData = dataContext.getActualData();
+			logger.info("actualData: " + actualData.toString(2));
+			processPropertiesArray = actualData.getJSONArray("processProperties");
+			for(Object itemObj:processPropertiesArray)	
+			{
+				JSONObject item=(JSONObject)itemObj;
+				PropertyItem propertyItem = new PropertyItem();
+				returnProcessProperties.add(propertyItem);
+				propertyItem.setGuid(UUID.randomUUID().toString());
+				if (item.has("propName"))
+					propertyItem.setName(item.getString("propName"));
+				if (item.has("propValue"))
+					propertyItem.setValue(item.getString("propValue"));
+			}
+			documentsArray=actualData.getJSONArray("documents");
+			returnDocument="";
+			if (documentsArray.length()>0)
+			{
+				documentObject=documentsArray.getJSONObject(0);
+				if (documentObject.has("docContents"))
+					returnDocument=documentObject.getString("docContents");
+				for(Object itemObj:documentObject.getJSONArray("documentProperties"))	
+				{
+					JSONObject item=(JSONObject)itemObj;
+					PropertyItem propertyItem = new PropertyItem();
+					returnDocumentProperties.add(propertyItem);
+					propertyItem.setGuid(UUID.randomUUID().toString());
+					if (item.has("propName"))
+						propertyItem.setName(item.getString("propName"));
+					if (item.has("propValue"))
+						propertyItem.setValue(item.getString("propValue"));
+				}
+			}
+		}
+	}
+
+	public String getReturnDocument() {
+		return returnDocument;
+	}
+
+	public List<PropertyItem> getReturnDocumentProperties() {
+		return returnDocumentProperties;
+	}
+
+	public List<PropertyItem> getReturnProcessProperties() {
+		return returnProcessProperties;
+	}
+
+	public void runMapScript(String scriptText, List<MapScriptIOItem> inputFields, List<MapScriptIOItem> outputFields)
+	{
+		Binding binding = new Binding();
+		dataContext=null;
+		if (this.setMapInputOutputVars(binding, inputFields, outputFields))
+		{			
+			if (runGroovy(binding, scriptText))
+			{
+				//for loop to getVariable output field values
+				for (MapScriptIOItem outputField:outputFields)
+				{
+					outputField.setFieldValue(binding.getVariable(outputField.getFieldName()).toString());
+				}
+			}	
+		}		
+	}
 	
 	public void run(String scriptText, String mockDocs)
 	{
 		Binding binding = new Binding();
-		stdout="";
 		actualDocs="";
-		CompilerConfiguration groovyCompilerConfiguration = new CompilerConfiguration();
-		groovyCompilerConfiguration.setDebug(false); //true shows stack traces
-		groovyCompilerConfiguration.setVerbose(false); //???What does this do?
-		StringWriter sw=new StringWriter();
-		binding.setProperty("out", sw);
 
-		DataContextImpl dataContext = new DataContextImpl(mockDocs);
-		ExecutionUtilNonStatic ExecutionUtil = new ExecutionUtilNonStatic();
-		ExecutionUtil.setDataContextImpl(dataContext);
-		binding.setVariable("dataContext", dataContext);
-		binding.setVariable("ExecutionUtil", ExecutionUtil);
-			
-		GroovyShell shell = new GroovyShell(binding, groovyCompilerConfiguration);
-		stdout=null;
-		try {
-			Script script = shell.parse(scriptText);
-			script.setBinding(binding);
-			script.run();			
-		} catch (CompilationFailedException e)
-		{
-			stdout=e.getMessage();
-		} catch (Exception e)
-		{
-			stdout=e.getMessage();
-		}
-		if (stdout==null) stdout = sw.toString();
-		actualDocs=dataContext.getActualData().toString(2);
+		dataContext = new DataContextImpl(new JSONObject(mockDocs));		
+		if(runGroovy(binding, scriptText))		
+			actualDocs=dataContext.getActualData().toString(2);
+	}
+	
+	public String getStdout() {
+		return stdout;
 	}
 
-	//TODO IO Process Properties
-	public void runMapScript(String scriptText, List<MapScriptIOItem> inputFields, List<MapScriptIOItem> outputFields)
-	{
-		Binding binding = new Binding();
-		stdout="";
-		CompilerConfiguration groovyCompilerConfiguration = new CompilerConfiguration();
-		groovyCompilerConfiguration.setDebug(false); //true shows stack traces
-		groovyCompilerConfiguration.setVerbose(false); //???What does this do?
-		StringWriter sw=new StringWriter();
-		binding.setProperty("out", sw);
+	public String getActualDocs() {
+		return actualDocs;
+	}
 
-		DataContextImpl dataContext=null ;//= new DataContextImpl(mockDocs);
-		ExecutionUtilNonStatic ExecutionUtil = new ExecutionUtilNonStatic();
-		ExecutionUtil.setDataContextImpl(dataContext);
-		binding.setVariable("dataContext", dataContext);
-		binding.setVariable("ExecutionUtil", ExecutionUtil);
-		binding.setVariable("output", "");
+	private boolean setMapInputOutputVars(Binding binding, List<MapScriptIOItem> inputFields, List<MapScriptIOItem> outputFields)
+	{
 		//for loop to setVariable input field names and set their values 
 		String boomiDateFormat = "yyyyMMDD HHmmss.SSS";
 		SimpleDateFormat sdf = new SimpleDateFormat(boomiDateFormat);
@@ -125,47 +210,58 @@ public class GroovyRunner {
 				binding.setVariable(inputField.getFieldName(), value);
 		}
 		
-		if (sbParseErrors.length() == 0)
+		for (MapScriptIOItem outputField:outputFields)
 		{
-			for (MapScriptIOItem outputField:outputFields)
-			{
-				binding.setVariable(outputField.getFieldName(), "");
-			}
-			
-			//for loop to setVariable output fields names
-			GroovyShell shell = new GroovyShell(binding, groovyCompilerConfiguration);
-			stdout=null;
-			try {
-				Script script = shell.parse(scriptText);
-				script.setBinding(binding);
-				script.run();			
-
-				//for loop to getVariable output field values
-				for (MapScriptIOItem outputField:outputFields)
-				{
-					outputField.setFieldValue(binding.getVariable(outputField.getFieldName()).toString());
-				}
-				System.out.println("output: " + binding.getVariable("output"));
-			} catch (CompilationFailedException e)
-			{
-				stdout=e.getMessage();
-			} catch (Exception e)
-			{
-				stdout=e.getMessage();
-			}
-
-			if (stdout==null) stdout = sw.toString();
-		} else {
-			stdout=sbParseErrors.toString();		
+			binding.setVariable(outputField.getFieldName(), "");
 		}
 		
+		if (sbParseErrors.length()>0)
+		{
+			stdout=sbParseErrors.toString();	
+			return false;
+		}
+		
+		return true;
 	}
-
-	public String getStdout() {
-		return stdout;
-	}
-
-	public String getActualDocs() {
-		return actualDocs;
+	
+	private boolean runGroovy(Binding binding, String scriptText)
+	{
+		boolean success=true;
+		
+		//This is a trick to allow a non-static implementation of ExecutionUtil
+		scriptText = scriptText.replace("import com.boomi.execution.ExecutionUtil", "");
+		StringWriter sw=new StringWriter();
+		binding.setProperty("out", sw);
+		ExecutionUtilNonStatic ExecutionUtil = new ExecutionUtilNonStatic(sw);
+		ExecutionUtil.setDataContextImpl(dataContext);
+		binding.setVariable("dataContext", dataContext);
+		binding.setVariable("ExecutionUtil", ExecutionUtil);
+			
+		CompilerConfiguration groovyCompilerConfiguration = new CompilerConfiguration();
+		groovyCompilerConfiguration.setDebug(false); //true shows stack traces
+		groovyCompilerConfiguration.setVerbose(false); //???What does this do?
+		GroovyShell shell = new GroovyShell(binding, groovyCompilerConfiguration);
+		stdout=null;
+		try {
+			Script script = shell.parse(scriptText);
+			script.setBinding(binding);
+			script.run();			
+		} catch (CompilationFailedException e)
+		{
+			stdout=e.getMessage();
+			success=false;
+		} catch (Exception e)
+		{
+			stdout=e.getMessage();
+			success=false;
+		}
+		catch (Throwable e)
+		{
+			stdout=e.getMessage();
+			success=false;
+		}
+		if (stdout==null) 
+			stdout = sw.toString();
+		return success;
 	}
 }

@@ -16,8 +16,9 @@ public class DataContextImpl {
 	{
 		return _actualData;
 	}
-	public DataContextImpl(String mock) {
-		_mockData = new JSONObject(mock);
+	
+	public DataContextImpl(JSONObject mock) {
+		_mockData = mock;
 		_actualData = new JSONObject();
 		_actualData.put("documents", new JSONArray());
 		JSONArray mockProcessProperties = _mockData.getJSONArray("processProperties");
@@ -37,7 +38,7 @@ public class DataContextImpl {
 		for (int i=0; i<getProcessProperties().length(); i++)
 		{
 			JSONObject processProperty = getProcessProperties().getJSONObject(i);
-			if (processProperty.getString("propName").contentEquals(propName))
+			if (processProperty.has("propName") && processProperty.getString("propName").contentEquals(propName))
 				return processProperty;
 		}
 		return null;
@@ -45,9 +46,9 @@ public class DataContextImpl {
 	
 	public String getDynamicProcessProperty(String propName)
 	{
-		String propValue=null;
+		String propValue="";
 		JSONObject processProperty = findProcessProperty(propName);
-		if (processProperty!=null)
+		if (processProperty!=null && processProperty.has("propValue"))
 			propValue = processProperty.getString("propValue");
 		
 		return propValue;
@@ -90,7 +91,10 @@ public class DataContextImpl {
 
 	public InputStream getStream(int index) {
 		JSONObject document = this.getMockDocument(index);
-		return new ByteArrayInputStream(document.getString("docContents").getBytes());
+		String docContents = "";
+		if (document.has("docContents"))
+			docContents = document.getString("docContents");
+		return new ByteArrayInputStream(docContents.getBytes());
 	}
 
 	private JSONObject getMockDocument(int index) {
@@ -105,11 +109,16 @@ public class DataContextImpl {
 			for (int i=0; i<documentProperties.length(); i++)
 			{
 				JSONObject documentProperty = documentProperties.getJSONObject(i);
-				String propName = documentProperty.getString("propName");
+				String propName = "";
+				if (documentProperty.has("propName"))
+					propName = documentProperty.getString("propName");
 				
-				if (propName!=null && propName.length()>0)
+				if (propName!=null && propName.trim().length()>0)
 				{
-					properties.put(propName, documentProperty.getString("propValue"));
+					String propValue = "";
+					if (documentProperty.has("propValue"))
+						propValue = documentProperty.getString("propValue");
+					properties.put(propName, propValue);
 				}
 			}
 		}

@@ -22,6 +22,21 @@ public class ExecutionTask {
 
 	    return value;
 	  }
+	  
+	  public ExecutionTask getParent()
+	  {
+		  return null;
+	  }
+	  
+	  public String getProcessId()
+	  {
+		 return "PROCESSID"; 
+	  }
+
+	  public String getExecutionId()
+	  {
+		 return "EXECUTIONID"; 
+	  }
 
 //	  public Property getDefinedProperty(String componentId, String propId) {
 //	    return this.manager._props.get(buildPropertyName(componentId, propId));

@@ -1,34 +1,20 @@
 package com.boomi.execution;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import com.manywho.services.atomsphere.AtomsphereAPI;
 import com.manywho.services.atomsphere.ServiceConfiguration;
 import com.manywho.services.atomsphere.actions.groovymapscriptrunner.MapScriptIOItem;
+import com.manywho.services.atomsphere.actions.groovyprocessscriptrunner.PropertyItem;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Disabled;
-
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
 
 public class GroovyDebuggerTest {
 	
@@ -56,27 +42,6 @@ public class GroovyDebuggerTest {
 		System.out.println(script);
 		assertTrue(script.length()>100);
 	}
-
-	@Test   
-    public void testHello() throws Exception
-    {
-		Binding binding = new Binding();
-
-		CompilerConfiguration groovyCompilerConfiguration = new CompilerConfiguration();
-//		groovyCompilerConfiguration.setScriptBaseClass("Templates");
-		groovyCompilerConfiguration.setDebug(true);
-		groovyCompilerConfiguration.setVerbose(true);
-		StringWriter sw=new StringWriter();
-		binding.setProperty("out", sw);
-		
-		GroovyShell shell = new GroovyShell(binding, groovyCompilerConfiguration);
-		String testScript = TestUtil.readResource("hello.groovy", this.getClass());
-		Script script = shell.parse(testScript);
-		script.setBinding(binding);
-		script.run();
-		System.out.println(sw.toString());
-		assertTrue(sw.toString().length()>0);
-	}
     
     @Test
     public void testBoomi() throws Exception
@@ -92,7 +57,39 @@ public class GroovyDebuggerTest {
 		String stdout = gr.getStdout(); 
 		System.out.println(stdout);
 		assertTrue(stdout.length()>0);
-		System.out.println(gr.getActualDocs());
+//		System.out.println(gr.getActualDocs());
+    }
+    
+    @Test
+    public void testProcessScript() throws Exception
+    {
+		String testScript = TestUtil.readResource("boomi.groovy", this.getClass());
+		List<PropertyItem>processProperties = new ArrayList<PropertyItem>();
+		List<PropertyItem>documentProperties = new ArrayList<PropertyItem>();
+		PropertyItem item = new PropertyItem();
+		processProperties.add(item);
+		item.setName("DPPName1");
+		item.setValue("DPPValue11111");
+		item = new PropertyItem();
+		processProperties.add(item);
+		item.setName("DPPName2");
+		item.setValue("DPPValue2");
+
+		documentProperties.add(item);
+		item.setName("DDPName1");
+		item.setValue("DDPValue1");
+		item = new PropertyItem();
+		documentProperties.add(item);
+		item.setName("DDPName2");
+		item.setValue("DDPValue2");
+
+		GroovyRunner gr = new GroovyRunner();
+		gr.runProcessScript(testScript, "Document 1", documentProperties, processProperties);
+
+		String stdout = gr.getStdout(); 
+		System.out.println(stdout);
+		assertTrue(stdout.length()>0);
+//		System.out.println(gr.getActualDocs());
     }
     
     @Test

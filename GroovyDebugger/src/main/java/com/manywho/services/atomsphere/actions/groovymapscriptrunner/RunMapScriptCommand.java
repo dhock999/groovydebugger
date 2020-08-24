@@ -17,15 +17,11 @@ public class RunMapScriptCommand implements ActionCommand<ServiceConfiguration, 
 	public ActionResponse<Outputs> execute(ServiceConfiguration configuration, ServiceRequest request, Inputs input) {
 		String consoleOutput="";
 		logger = Logger.getLogger(this.getClass().getName());
-		try {
-			GroovyRunner gr = new GroovyRunner();
-			gr.runMapScript(input.getScript(), input.getInputFields(), input.getOutputFields());
-			consoleOutput = gr.getStdout(); 
-			logger.warning(consoleOutput);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		logger.warning(input.getOutputFields().toString());
+		GroovyRunner gr = new GroovyRunner();
+		gr.runMapScript(input.getScript(), input.getInputFields(), input.getOutputFields());
+		consoleOutput = gr.getStdout(); 
+		logger.info(consoleOutput);
+		logger.info(input.getOutputFields().toString());
  
 		return new ActionResponse<>(new Outputs(consoleOutput, input.getOutputFields()));
 	}

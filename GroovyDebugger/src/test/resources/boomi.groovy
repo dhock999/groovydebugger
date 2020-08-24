@@ -1,6 +1,10 @@
 import java.util.Properties;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.util.logging.Logger;
+
+Logger logger = ExecutionUtil.getBaseLogger();
+logger.info("HELLO FROM LOGGER");
 
 println dataContext.getDataCount();
 for( int i = 0; i < dataContext.getDataCount(); i++ ) {
