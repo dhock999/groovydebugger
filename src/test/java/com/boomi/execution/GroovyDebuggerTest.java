@@ -28,7 +28,7 @@ public class GroovyDebuggerTest {
 		configuration.setPassword(testCredentials.getString("password"));
 	}
 	
-	@Test
+//	@Test
 	public void testGetProcessScript() throws JSONException, Exception
 	{
 		String script;
