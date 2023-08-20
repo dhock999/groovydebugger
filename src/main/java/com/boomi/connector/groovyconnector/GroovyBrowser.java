@@ -9,15 +9,17 @@ import com.boomi.util.StringUtil;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
-public class GroovyBrowser extends BaseBrowser{
+public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	Binding _binding;
 	GroovyShell _shell;
 	Logger _logger = Logger.getLogger("GroovyBrowser");
+	
 	protected GroovyBrowser(BaseConnection<BrowseContext> connection) {
 		super(connection);
 		 _shell = GroovyScriptHelpers.getShell();
 	     _binding = new Binding();
 	     _binding.setVariable("context", this.getContext());
+	     _binding.setVariable("logger", _logger);
 	}
 
 	@Override
@@ -52,5 +54,17 @@ public class GroovyBrowser extends BaseBrowser{
         }
 
 		return objectDefinitions;
+	}
+
+	@Override
+	public void testConnection() {
+		String scriptName = "testConnection.groovy";
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+        if (StringUtil.isNotBlank(scriptText))
+        {
+            GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+        } else {
+        	throw new ConnectorException("A script is required for testConnection");
+        }
 	}
 }

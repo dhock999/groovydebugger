@@ -6,8 +6,10 @@ import com.boomi.connector.api.listen.ListenManager;
 import com.boomi.connector.api.listen.Listener;
 import com.boomi.connector.api.listen.SingletonListenOperation;
 import com.boomi.connector.util.listen.UnmanagedListenOperation;
+import com.boomi.execution.StdOutLoggerHandler;
 import com.boomi.util.StringUtil;
-
+import java.io.StringWriter;
+import java.util.logging.Logger;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
@@ -16,11 +18,16 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
 	Binding _binding;
 	GroovyShell _shell;
 	Resources resources = new Resources();
+	Logger logger = Logger.getLogger("GroovyListenOperation");
+	private StringWriter _debugLogWriter;
     public GroovyListenOperation(OperationContext context) {
         super(context);
 		 _shell = GroovyScriptHelpers.getShell();
 	     _binding = new Binding();
 	     _binding.setVariable("context", this.getContext());
+	     if (_debugLogWriter!=null)
+	    	 logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
+	     _binding.setVariable("logger", logger);
     }
 
 	@Override
@@ -58,5 +65,10 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
 	class Resources {
 		public Object resource1;
 		public Object resource2;
+	}
+
+	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
+		this._debugLogWriter = debugLogWriter;
+		_binding.setVariable("out", debugLogWriter);
 	}
 }

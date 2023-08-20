@@ -3,6 +3,9 @@
 
 package com.boomi.connector.groovyconnector;
 
+import java.io.StringWriter;
+import java.util.logging.Logger;
+
 import com.boomi.connector.api.BrowseContext;
 import com.boomi.connector.api.Browser;
 import com.boomi.connector.api.Operation;
@@ -10,21 +13,37 @@ import com.boomi.connector.util.BaseConnection;
 import com.boomi.connector.api.OperationContext;
 import com.boomi.connector.util.listen.UnmanagedListenConnector;
 import com.boomi.connector.util.listen.UnmanagedListenOperation;
+import com.boomi.execution.StdOutLoggerHandler;
 
 public class  GroovyConnector extends UnmanagedListenConnector {
-
+	StringWriter _debugLogWriter;
+	
+	public GroovyConnector ()
+	{
+		super();
+	}
+	
+	public GroovyConnector (StringWriter debugLogWriter)
+	{
+		super();
+		this._debugLogWriter=debugLogWriter;
+	}
+	
     public Browser createBrowser(BrowseContext browseContext) {
         return new GroovyBrowser(new BaseConnection(browseContext));
     }
     
     @Override
     public Operation createExecuteOperation(OperationContext operationContext){
-        return new GroovyExecuteOperation(new BaseConnection(operationContext));
+    	GroovyExecuteOperation operation = new GroovyExecuteOperation(new BaseConnection(operationContext));
+    	operation.setRedirectDebugLogger(_debugLogWriter);
+    	return operation;
     }
     
 	@Override
 	public UnmanagedListenOperation createListenOperation(OperationContext context) {
-		return new GroovyListenOperation(context);
+		GroovyListenOperation operation = new GroovyListenOperation(context);
+    	operation.setRedirectDebugLogger(_debugLogWriter);
+		return operation;
 	}
-
 }

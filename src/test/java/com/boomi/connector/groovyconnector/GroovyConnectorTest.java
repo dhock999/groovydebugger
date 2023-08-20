@@ -1,4 +1,4 @@
-package com.boomi.connector.groovyconnector.tester;
+package com.boomi.connector.groovyconnector;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestRunner {
+public class GroovyConnectorTest {
 	static String _executeOperationScript;
 	private static String _startListenerScript;
 	private static String _stopListenerScript;
@@ -21,7 +21,7 @@ public class TestRunner {
         _executeOperationScript = new String(Files.readAllBytes(Paths.get("./src/test/executeOperation.groovy")));
         _startListenerScript = new String(Files.readAllBytes(Paths.get("./src/test/startListener.groovy")));
         _stopListenerScript = new String(Files.readAllBytes(Paths.get("./src/test/stopListener.groovy")));
-        String testScriptText = new String(Files.readAllBytes(Paths.get("./src/test/OperationTest.groovy")));
+        String testScriptText = new String(Files.readAllBytes(Paths.get("./src/test/operationTest.groovy")));
         run(testScriptText);
         
 //        testScriptText = new String(Files.readAllBytes(Paths.get("./src/test/BrowseTest.groovy")));

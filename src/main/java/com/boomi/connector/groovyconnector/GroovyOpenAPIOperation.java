@@ -1,38 +1,33 @@
-
-// Copyright (c) 2022 Boomi, Inc.
-
 package com.boomi.connector.groovyconnector;
 
-
-import com.boomi.common.apache.http.request.HttpRequestUtil;
 import com.boomi.connector.api.ObjectData;
 import com.boomi.connector.openapi.OpenAPIOperation;
 import com.boomi.connector.openapi.OpenAPIOperationConnection;
-import com.boomi.connector.openapi.entity.JSONArrayWrappedRepeatableEntity;
+import com.boomi.execution.StdOutLoggerHandler;
 import com.boomi.util.StringUtil;
-import com.boomi.util.json.JSONUtil;
-
 import groovy.lang.*;
-
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-
 import org.apache.http.HttpEntity;
 
 public class GroovyOpenAPIOperation extends OpenAPIOperation {
     Logger logger = Logger.getLogger("GroovyOpenAPIOperation");
-
     Binding _binding;
     GroovyShell _shell;
+	private StringWriter _debugLogWriter;
+    
     protected GroovyOpenAPIOperation(OpenAPIOperationConnection connection) {
         super(connection);
         _shell = GroovyScriptHelpers.getShell();
         _binding = new Binding();
         _binding.setVariable("context", this.getContext());
         _binding.setVariable("connection", this.getConnection());
-
+	     if (_debugLogWriter!=null)
+	    	 logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
+        _binding.setVariable("logger", logger);
     }
     
     @Override
@@ -68,4 +63,8 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
         return (OpenAPIOperationConnection) super.getConnection();
     }
 
+	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
+		this._debugLogWriter = debugLogWriter;
+		_binding.setVariable("out", debugLogWriter);
+	}
  }

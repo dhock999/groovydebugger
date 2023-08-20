@@ -18,8 +18,7 @@ public class StdOutLoggerHandler extends Handler {
 
 	@Override
 	public void publish(LogRecord record) {
-
-		String s = String.format("%s\t%s\t%s\n", sdf.format(new Date(record.getMillis())), record.getLevel().getName(), record.getMessage());
+		String s = String.format("%s\t%s\t%s\t%s\t%s\n", sdf.format(new Date(record.getMillis())), record.getLevel().getName(), record.getSourceClassName(),record.getSourceMethodName(),record.getMessage());
 		sw.append(s);
 	}
 
