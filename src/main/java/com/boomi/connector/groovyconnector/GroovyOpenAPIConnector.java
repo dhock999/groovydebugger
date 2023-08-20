@@ -31,7 +31,7 @@ public class GroovyOpenAPIConnector extends OpenAPIConnector {
 
     @Override
     public Operation createExecuteOperation(final OperationContext operationContext){
-    	GroovyOpenAPIOperation operation = new GroovyOpenAPIOperation(new OpenAPIOperationConnection(operationContext));
+    	GroovyOpenAPIOperation operation = new GroovyOpenAPIOperation(new GroovyOpenAPIOperationConnection(operationContext));
     	operation.setRedirectDebugLogger(_debugLogWriter);
     	return operation;
     }
