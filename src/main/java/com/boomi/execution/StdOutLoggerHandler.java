@@ -12,13 +12,14 @@ public class StdOutLoggerHandler extends Handler {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss a");
 
 	private StringWriter sw;
+	private String scriptName = "Script";
 	public StdOutLoggerHandler(StringWriter sw) {
 		this.sw=sw;
 	}
 
 	@Override
 	public void publish(LogRecord record) {
-		String s = String.format("%s\t%s\t%s\t%s\t%s\n", sdf.format(new Date(record.getMillis())), record.getLevel().getName(), record.getSourceClassName(),record.getSourceMethodName(),record.getMessage());
+		String s = String.format("%s\t%s\t%s\t%s\n", sdf.format(new Date(record.getMillis())), record.getLevel().getName(), scriptName, record.getMessage());
 		sw.append(s);
 	}
 
@@ -28,5 +29,10 @@ public class StdOutLoggerHandler extends Handler {
 
 	@Override
 	public void close() throws SecurityException {
+	}
+	
+	public void setScriptName(String scriptName)
+	{
+		this.scriptName = scriptName;
 	}
 }

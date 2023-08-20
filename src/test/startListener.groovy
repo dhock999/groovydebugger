@@ -2,11 +2,12 @@ import com.boomi.connector.api.listen.Listener;
 import com.boomi.connector.api.PayloadUtil;
 
 //resources.resource1, resources.resource2 are persisted between start/stop listener
+logger.info("logger startListener")
 resources.resource1 = new SocketThread(listener)
 Thread t = new Thread(resources.resource1);
 t.start();
 
-println "startListener fini"
+println "println startListener fini"
 
 public class SocketThread implements Runnable {
 

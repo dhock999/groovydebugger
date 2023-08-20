@@ -9,7 +9,9 @@ import java.util.logging.Logger;
 
 //Log to Process Log
 Logger logger = response.getLogger();
-logger.info("executeUpdate method from groovy");
+logger.info("logger executeUpdate method from groovy");
+println "println executeUpdate method from groovy";
+
 
 //Get url value from the Connection field in UI or Environment Extension
 def url = context.getConnectionProperties().getProperty("url");
@@ -22,6 +24,7 @@ logger.info(fullUrl)
 
 //Open an http connection
 def httpConnection = new URL(fullUrl).openConnection();
+logger.info("logger executeOperation.groovy")
 
 //Get the Execute Operation custom type (GET, POST etc)
 def customOperationType = context.getCustomOperationType()
@@ -38,8 +41,6 @@ for (ObjectData data : request) {
     //if POST write the each document coming into the connector
     if (customOperationType=="POST")
     {
-        def xx=null
-        xx.x
         InputStream inputStream = data.getData();
         OutputStream outputStream = httpConnection.getOutputStream()
         byte[] buffer = new byte[8192];

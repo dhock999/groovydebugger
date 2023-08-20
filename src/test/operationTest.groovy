@@ -14,10 +14,10 @@ import com.boomi.connector.groovyconnector.tester.MockOperationContext;
 import com.boomi.connector.groovyconnector.tester.MockListener;
 import com.boomi.connector.testutil.SimpleBrowseContext;
 
+println "println from operationTest.groovy"
 //Create an instance of the connector to test
 //This constructor enables connector logging to be directed to the console
 GroovyConnector connector = new GroovyConnector(out);
-
 //Simulate user setting the URL in the Connection UI. Note connectionProperties is prefined
 connectionProperties.put("url", "https://petstore3.swagger.io/api/v3");
 ConnectorTester tester = new ConnectorTester(connector);
@@ -61,7 +61,7 @@ tester.setBrowseContext(sbc);
 ///LISTENER
 def listener = new MockListener();
 tester.setOperationContext(OperationType.LISTEN, connectionProperties, opProps, null, null);
-def listenOperation = new GroovyListenOperation(tester.getOperationContext());
+def listenOperation = new GroovyListenOperation(tester.getOperationContext(), out);
 listenOperation.start(listener);
 
 Thread.sleep(61000)

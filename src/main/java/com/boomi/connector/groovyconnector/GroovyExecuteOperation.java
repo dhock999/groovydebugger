@@ -13,35 +13,37 @@ import java.io.StringWriter;
 import java.util.logging.Logger;
 
 public class GroovyExecuteOperation extends BaseUpdateOperation {
-    Logger logger = Logger.getLogger("GroovyExecuteOperation");
+    Logger _logger = Logger.getLogger("GroovyExecuteOperation");
 
     //TODO we want to simplify overhead of having a script launcher in every class....but we also want to stay factored for things like compiled scripts in the connector cache....
     Binding _binding;
     GroovyShell _shell;
 
 	private StringWriter _debugLogWriter;
+
+	private StdOutLoggerHandler _stdoutHandler;
     protected GroovyExecuteOperation(BaseConnection connection) {
         super(connection);
         _shell = GroovyScriptHelpers.getShell();
         _binding = new Binding();
         _binding.setVariable("context", this.getContext());
-	     if (_debugLogWriter!=null)
-	    	 logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
-        _binding.setVariable("logger", logger);
+        _binding.setVariable("logger", _logger);
     }
     @Override
     protected void executeUpdate(UpdateRequest request, OperationResponse response) {
         String scriptName = "executeOperation.groovy";
-        logger = response.getLogger();
+        _logger = response.getLogger();
         //TODO how do we get this to stdio during test time?
-        logger.info("executeOperation Launching Groovy Script");
+        _logger.info("executeOperation Launching Groovy Script");
         
         String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
-   	     	if (_debugLogWriter!=null)
-   	     		logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
-            _binding.setVariable("logger", logger);
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
+            if (_debugLogWriter!=null)
+            	_logger.addHandler(_stdoutHandler);
+            _binding.setVariable("logger", _logger);
             _binding.setVariable("request", request);
             _binding.setVariable("response", response);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
@@ -51,6 +53,8 @@ public class GroovyExecuteOperation extends BaseUpdateOperation {
     }
 	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
 		this._debugLogWriter = debugLogWriter;
+		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+		_logger.addHandler(_stdoutHandler);
 		_binding.setVariable("out", debugLogWriter);
 	}
  }

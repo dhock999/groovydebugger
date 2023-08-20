@@ -1,10 +1,12 @@
 package com.boomi.connector.groovyconnector;
 
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.logging.Logger;
 import com.boomi.connector.api.*;
 import com.boomi.connector.util.BaseBrowser;
 import com.boomi.connector.util.BaseConnection;
+import com.boomi.execution.StdOutLoggerHandler;
 import com.boomi.util.StringUtil;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -13,6 +15,8 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	Binding _binding;
 	GroovyShell _shell;
 	Logger _logger = Logger.getLogger("GroovyBrowser");
+	private StringWriter _debugLogWriter;
+	private StdOutLoggerHandler _stdoutHandler;
 	
 	protected GroovyBrowser(BaseConnection<BrowseContext> connection) {
 		super(connection);
@@ -48,6 +52,8 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
             _binding.setVariable("objectDefinitions", objectDefinitions);
             _binding.setVariable("roles", roles);
             _binding.setVariable("objectTypeId", objectTypeId);
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         } else {
         	throw new ConnectorException("A script is required for getObjectDefinitions");
@@ -62,9 +68,18 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         } else {
         	throw new ConnectorException("A script is required for testConnection");
         }
+	}
+
+	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
+		this._debugLogWriter = debugLogWriter;
+		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+		_logger.addHandler(_stdoutHandler);
+		_binding.setVariable("out", debugLogWriter);
 	}
 }

@@ -14,19 +14,21 @@ import com.boomi.connector.openapi.OpenAPIOperationConnection;
 public class GroovyOpenAPIConnector extends OpenAPIConnector {
 	StringWriter _debugLogWriter;
 	
-	public GroovyOpenAPIConnector ()
+	public GroovyOpenAPIConnector()
 	{
 		super();
 	}
 
 	public GroovyOpenAPIConnector (StringWriter debugLogWriter)
 	{
-		super();
+		this();
 		this._debugLogWriter=debugLogWriter;
 	}
 	
     public Browser createBrowser(BrowseContext browseContext) {
-        return new GroovyOpenAPIBrowser(new GroovyOpenAPIConnection(browseContext));
+    	GroovyOpenAPIBrowser browser = new GroovyOpenAPIBrowser(new GroovyOpenAPIConnection(browseContext));
+    	browser.setRedirectDebugLogger(_debugLogWriter);
+    	return browser;
     }
 
     @Override

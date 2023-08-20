@@ -20,23 +20,29 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
 	Resources resources = new Resources();
 	Logger logger = Logger.getLogger("GroovyListenOperation");
 	private StringWriter _debugLogWriter;
+	private StdOutLoggerHandler _stdoutHandler;
+	
     public GroovyListenOperation(OperationContext context) {
         super(context);
 		 _shell = GroovyScriptHelpers.getShell();
 	     _binding = new Binding();
-	     _binding.setVariable("context", this.getContext());
-	     if (_debugLogWriter!=null)
-	    	 logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
+	     _binding.setVariable("context", this.getContext());	    	 
 	     _binding.setVariable("logger", logger);
     }
 
-	@Override
+    public GroovyListenOperation(OperationContext context, StringWriter debugLogWriter) {
+    	this(context);
+    	this.setRedirectDebugLogger(debugLogWriter);
+    }
+   	@Override
 	public void stop() {
 		String scriptName = "stopListener.groovy";
 	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("resources", resources);
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         } else {
         	throw new ConnectorException("A script is required for stopListener");
@@ -51,6 +57,8 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
         {
             _binding.setVariable("resources", resources);
             _binding.setVariable("listener", listener);
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         } else {
         	throw new ConnectorException("A script is required for startListener");
@@ -69,6 +77,8 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
 
 	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
 		this._debugLogWriter = debugLogWriter;
+		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+		logger.addHandler(_stdoutHandler);
 		_binding.setVariable("out", debugLogWriter);
 	}
 }

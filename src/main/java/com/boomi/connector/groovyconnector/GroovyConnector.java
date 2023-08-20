@@ -25,12 +25,14 @@ public class  GroovyConnector extends UnmanagedListenConnector {
 	
 	public GroovyConnector (StringWriter debugLogWriter)
 	{
-		super();
+		this();
 		this._debugLogWriter=debugLogWriter;
 	}
 	
     public Browser createBrowser(BrowseContext browseContext) {
-        return new GroovyBrowser(new BaseConnection(browseContext));
+    	GroovyBrowser browser = new GroovyBrowser(new BaseConnection(browseContext));
+    	browser.setRedirectDebugLogger(_debugLogWriter);
+    	return browser;
     }
     
     @Override
@@ -40,10 +42,11 @@ public class  GroovyConnector extends UnmanagedListenConnector {
     	return operation;
     }
     
+    //We never debug with the actual listener, we have to use a mock because not supported by Connector Tester
+    //TODO could we extend connector tester someday?
 	@Override
 	public UnmanagedListenOperation createListenOperation(OperationContext context) {
 		GroovyListenOperation operation = new GroovyListenOperation(context);
-    	operation.setRedirectDebugLogger(_debugLogWriter);
 		return operation;
 	}
 }

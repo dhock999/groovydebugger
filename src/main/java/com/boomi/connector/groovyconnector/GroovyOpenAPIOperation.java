@@ -14,10 +14,11 @@ import java.util.logging.Logger;
 import org.apache.http.HttpEntity;
 
 public class GroovyOpenAPIOperation extends OpenAPIOperation {
-    Logger logger = Logger.getLogger("GroovyOpenAPIOperation");
+    Logger _logger = Logger.getLogger("GroovyOpenAPIOperation");
     Binding _binding;
     GroovyShell _shell;
 	private StringWriter _debugLogWriter;
+	private StdOutLoggerHandler _stdoutHandler;
     
     protected GroovyOpenAPIOperation(OpenAPIOperationConnection connection) {
         super(connection);
@@ -26,8 +27,8 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
         _binding.setVariable("context", this.getContext());
         _binding.setVariable("connection", this.getConnection());
 	     if (_debugLogWriter!=null)
-	    	 logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
-        _binding.setVariable("logger", logger);
+	    	 _logger.addHandler(new StdOutLoggerHandler(_debugLogWriter));
+        _binding.setVariable("logger", _logger);
     }
     
     @Override
@@ -39,7 +40,9 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
         {
             _binding.setVariable("data", data);
             _binding.setVariable("headers", headers);
-            GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
+           GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         }
         return headers;
     }
@@ -53,6 +56,8 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
         {
             _binding.setVariable("data", data);
             _binding.setVariable("entity", entity);
+            if (_stdoutHandler!=null)
+            	_stdoutHandler.setScriptName(scriptName);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         }
       return entity;
@@ -65,6 +70,8 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
 
 	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
 		this._debugLogWriter = debugLogWriter;
+		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+		_logger.addHandler(_stdoutHandler);
 		_binding.setVariable("out", debugLogWriter);
 	}
  }
