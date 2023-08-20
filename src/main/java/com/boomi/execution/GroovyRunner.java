@@ -4,7 +4,9 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -13,8 +15,8 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.boomi.execution.DataContextImpl;
-import com.boomi.execution.ExecutionUtilNonStatic;
+import com.boomi.connector.groovyconnector.GroovyScriptHelpers;
+import com.manywho.services.atomsphere.actions.connectorTestMultiScript.ConnectorScriptItem;
 import com.manywho.services.atomsphere.actions.groovymapscriptrunner.MapScriptIOItem;
 import com.manywho.services.atomsphere.actions.groovyprocessscriptrunner.PropertyItem;
 
@@ -137,6 +139,20 @@ public class GroovyRunner {
 		}		
 	}
 	
+	public void runConnectorTestMulti(String testScript, List<ConnectorScriptItem> operationScripts)
+	{
+		logger.info("******runConnectorTestMulti " + operationScripts.size());
+		Binding binding = new Binding();
+		Map<String, Object> connectionProperties = new HashMap<String,Object>();
+		for (ConnectorScriptItem item: operationScripts)
+		{
+			connectionProperties.put(item.getName(), item.getScriptText());
+			logger.info("***DEBUGSCRIPT*** " + item.getName() + " " + item.getScriptText());
+		}
+		binding.setProperty("connectionProperties", connectionProperties);
+		runGroovy(binding, testScript);		
+	}
+	
 	public void run(String scriptText, String mockDocs)
 	{
 		Binding binding = new Binding();
@@ -238,30 +254,29 @@ public class GroovyRunner {
 		binding.setVariable("ExecutionUtil", ExecutionUtil);
 			
 		CompilerConfiguration groovyCompilerConfiguration = new CompilerConfiguration();
-		groovyCompilerConfiguration.setDebug(false); //true shows stack traces
-		groovyCompilerConfiguration.setVerbose(false); //???What does this do?
+		groovyCompilerConfiguration.setDebug(true); //true shows stack traces with line number etc. We want for printing full info
+		groovyCompilerConfiguration.setVerbose(true); //???What does this do?
 		GroovyShell shell = new GroovyShell(binding, groovyCompilerConfiguration);
-		stdout=null;
+		String exception="";
 		try {
 			Script script = shell.parse(scriptText);
 			script.setBinding(binding);
 			script.run();			
-		} catch (CompilationFailedException e)
-		{
-			stdout=e.getMessage();
-			success=false;
+//		} catch (CompilationFailedException e)
+//		{
+//			exception=GroovyScriptHelpers.getGroovyErrorWithScriptCode("Test Script", scriptText, e);
+//			success=false;
 		} catch (Exception e)
 		{
-			stdout=e.getMessage();
+			exception=GroovyScriptHelpers.getGroovyErrorWithScriptCode("Test Script", scriptText, e);
 			success=false;
 		}
-		catch (Throwable e)
-		{
-			stdout=e.getMessage();
-			success=false;
-		}
-		if (stdout==null) 
-			stdout = sw.toString();
+//		catch (Throwable e)
+//		{
+//			exception=GroovyScriptHelpers.getGroovyErrorWithScriptCode("Test Script", scriptText, e);
+//			success=false;
+//		}
+		stdout = sw.toString() + "\n" + exception;
 		return success;
 	}
 }

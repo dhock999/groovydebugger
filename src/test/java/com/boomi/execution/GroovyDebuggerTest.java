@@ -132,7 +132,7 @@ public class GroovyDebuggerTest {
 		gr.runMapScript(testScript, inputFields, outputFields);
 
 		String stdout = gr.getStdout();
-		String expectedStdout = "INPUTVALUE\r\n";
+		String expectedStdout = "INPUTVALUE\r\n\n";
 		System.out.println(stdout);
 		assertEquals(expectedStdout, stdout);
 
