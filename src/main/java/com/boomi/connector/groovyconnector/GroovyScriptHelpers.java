@@ -119,12 +119,12 @@ public class GroovyScriptHelpers {
         return new GroovyShell(groovyCompilerConfiguration);
     }
     
-    public static void runScript(GroovyShell shell, Binding binding, String scriptName, String scriptText)
+    public static Object runScript(GroovyShell shell, Binding binding, String scriptName, String scriptText)
     {
         try {
             Script script = shell.parse(scriptText); 
             script.setBinding(binding);
-            script.run();
+            return script.run();
         } catch (Exception e) {
         	e.printStackTrace();
             String error=GroovyScriptHelpers.getGroovyErrorWithScriptCode(scriptName, scriptText, e);

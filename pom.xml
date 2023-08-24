@@ -8,21 +8,21 @@
 	<artifactId>groovy</artifactId>
 	<version>2.0-SNAPSHOT</version>
 
-   <repositories>
-        <repository>
-            <id>boomisdk</id>
-            <name>Connector SDK Repository</name>
-            <url>https://boomisdk.s3.amazonaws.com/releases</url>
-        </repository>
-    </repositories>
-    
+	<repositories>
+		<repository>
+			<id>boomisdk</id>
+			<name>Connector SDK Repository</name>
+			<url>https://boomisdk.s3.amazonaws.com/releases</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-        <version.manywho.sdk>2.0.0</version.manywho.sdk>
-     	<connector.sdk.version>2.14.8</connector.sdk.version>
-   	</properties>
-<!--
+		<version.manywho.sdk>2.0.0</version.manywho.sdk>
+		<connector.sdk.version>2.15.3</connector.sdk.version>
+	</properties>
+	<!--
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -62,47 +62,109 @@
 	
 -->
 
-    <dependencies>
+	<dependencies>
 		<!-- OpenAPI Dependencies -->
-        <dependency>
-            <groupId>com.boomi.connsdk</groupId>
-            <artifactId>connector-sdk-openapi</artifactId>
-            <version>${connector.sdk.version}</version>
-            <!-- exclusions that are not needed or included by the atom-->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.noelios.restlet</groupId>
-                    <artifactId>com.noelios.restlet.ext.net</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.restlet</groupId>
-                    <artifactId>org.restlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>jsr305</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mailapi</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>com.boomi.connsdk</groupId>
+			<artifactId>connector-sdk-openapi</artifactId>
+			<version>${connector.sdk.version}</version>
+			<!-- exclusions that are not needed or included by the atom-->
+			<exclusions>
+				<exclusion>
+					<groupId>com.noelios.restlet</groupId>
+					<artifactId>com.noelios.restlet.ext.net</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.restlet</groupId>
+					<artifactId>org.restlet</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>jsr305</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>mailapi</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.boomi.connsdk</groupId>
+			<artifactId>connector-sdk-api</artifactId>
+			<version>${connector.sdk.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.boomi.connsdk</groupId>
+			<artifactId>connector-sdk-util</artifactId>
+			<version>${connector.sdk.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.boomi.util</groupId>
+			<artifactId>boomi-util</artifactId>
+			<version>2.3.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.boomi.util</groupId>
+			<artifactId>boomi-json-util</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.boomi.commonsdk</groupId>
+			<artifactId>common-sdk</artifactId>
+			<version>1.1.11</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>3.0.5</version>
+			<version>4.0.3</version>
 			<type>pom</type>
 		</dependency>
+
+		<!-- From Groovy SDK Connector -->
+		<!-- 
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20190722</version>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.0</version>
 		</dependency>
+		-->
+
+		<dependency>
+			<groupId>com.boomi.connsdk</groupId>
+			<artifactId>connector-sdk-test-util</artifactId>
+			<version>${connector.sdk.version}</version>
+			<exclusions>
+				<!--
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+               -->
+ 				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+				</exclusion>
+
+			</exclusions>
+		</dependency>
+		<!-- ************* FLOW-->
         <dependency>
             <groupId>com.manywho.sdk</groupId>
             <artifactId>sdk-server-undertow</artifactId>
@@ -129,47 +191,8 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.8.11.2</version>
         </dependency>
-        <!-- From Groovy SDK Connector -->
-               <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.boomi.connsdk</groupId>
-            <artifactId>connector-sdk-util</artifactId>
-            <version>${connector.sdk.version}</version>
-         </dependency>
-
-        <dependency>
-            <groupId>com.boomi.connsdk</groupId>
-            <artifactId>connector-sdk-test-util</artifactId>
-            <version>${connector.sdk.version}</version>
-            <exclusions>
-                <!--
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.xml</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                </exclusion>
-                exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                -->
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-
-            </exclusions>
-        </dependency>
- 
     </dependencies>
+
 
 
 	<build>

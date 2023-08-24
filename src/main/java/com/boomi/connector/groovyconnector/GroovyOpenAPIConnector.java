@@ -21,7 +21,7 @@ public class GroovyOpenAPIConnector extends OpenAPIConnector {
 
 	public GroovyOpenAPIConnector (StringWriter debugLogWriter)
 	{
-		this();
+		super();
 		this._debugLogWriter=debugLogWriter;
 	}
 	

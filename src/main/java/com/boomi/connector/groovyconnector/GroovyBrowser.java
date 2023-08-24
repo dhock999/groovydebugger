@@ -29,32 +29,32 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	@Override
 	public ObjectTypes getObjectTypes() {
 		_logger.info("getObjectTypes");
-		ObjectTypes objectTypes = new ObjectTypes();
+		ObjectTypes objectTypes = null;
+		System.out.println("****getObjectTypes");
 		String scriptName = "getObjectTypes.groovy";
 	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
-            _binding.setVariable("objectTypes", objectTypes);
-            GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+            objectTypes = (ObjectTypes) GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         } else {
         	throw new ConnectorException("A script is required for getObjectTypes");
         }
+        System.out.println("****getObjectTypes" + objectTypes.toString());
 		return objectTypes;
 	}
 
 	@Override
 	public ObjectDefinitions getObjectDefinitions(String objectTypeId, Collection<ObjectDefinitionRole> roles) {
-		ObjectDefinitions objectDefinitions = new ObjectDefinitions();
+		ObjectDefinitions objectDefinitions = null;
 		String scriptName = "getObjectDefinitions.groovy";
 	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
-            _binding.setVariable("objectDefinitions", objectDefinitions);
             _binding.setVariable("roles", roles);
             _binding.setVariable("objectTypeId", objectTypeId);
             if (_stdoutHandler!=null)
             	_stdoutHandler.setScriptName(scriptName);
-            GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+            objectDefinitions = (ObjectDefinitions) GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         } else {
         	throw new ConnectorException("A script is required for getObjectDefinitions");
         }
@@ -77,9 +77,12 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	}
 
 	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
-		this._debugLogWriter = debugLogWriter;
-		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
-		_logger.addHandler(_stdoutHandler);
-		_binding.setVariable("out", debugLogWriter);
+		if (debugLogWriter!=null)
+		{
+			this._debugLogWriter = debugLogWriter;
+			_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+			_logger.addHandler(_stdoutHandler);
+			_binding.setVariable("out", debugLogWriter);
+		}
 	}
 }

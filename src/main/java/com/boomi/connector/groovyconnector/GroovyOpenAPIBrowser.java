@@ -33,7 +33,7 @@ public class GroovyOpenAPIBrowser extends OpenAPIBrowser implements ConnectionTe
 	@Override
 	public ObjectTypes getObjectTypes() {
 		ObjectTypes objectTypes = super.getObjectTypes();
-		String scriptName = "getObjectTypes.groovy";
+		String scriptName = "filterObjectTypes.groovy";
 	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
@@ -60,9 +60,12 @@ public class GroovyOpenAPIBrowser extends OpenAPIBrowser implements ConnectionTe
 	}
 
 	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
-		this._debugLogWriter = debugLogWriter;
-		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
-		_logger.addHandler(_stdoutHandler);
-		_binding.setVariable("out", debugLogWriter);
+		if (debugLogWriter!=null)
+		{
+			this._debugLogWriter = debugLogWriter;
+			_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+			_logger.addHandler(_stdoutHandler);
+			_binding.setVariable("out", debugLogWriter);
+		}
 	}
 }

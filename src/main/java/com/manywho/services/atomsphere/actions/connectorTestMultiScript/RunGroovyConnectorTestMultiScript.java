@@ -2,6 +2,8 @@ package com.manywho.services.atomsphere.actions.connectorTestMultiScript;
 
 import java.util.List;
 
+import org.jboss.logging.Logger;
+
 import com.manywho.sdk.api.ContentType;
 import com.manywho.sdk.services.actions.Action;
 
@@ -9,6 +11,7 @@ import com.manywho.sdk.services.actions.Action;
 //TODO currently this just sends one simple executeUpdateOperation script. We need to pass in a list for things like startlistener, stop, getobjecttypes, getobjectdefinitons, getheaders, getentity, getspec..... 
 @Action.Metadata(name="Run Groovy Connector Test Multi Script", summary = "Execute a connector test and return console output", uri="/groovy/executeConnectorTestMulti")
 public class RunGroovyConnectorTestMultiScript {
+	static Logger logger = Logger.getLogger("RunGroovyConnectorTestMultiScript");
 	public static class Inputs{
 	    @Action.Input(name = "Test Script", contentType = ContentType.String)
 	    private String testScript;
@@ -80,6 +83,7 @@ public class RunGroovyConnectorTestMultiScript {
 
 		public Outputs(String consoleOutput)
 		{
+			logger.info(consoleOutput);
 			this.consoleOutput=consoleOutput;
 		}
 	}

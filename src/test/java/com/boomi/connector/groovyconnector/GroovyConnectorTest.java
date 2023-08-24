@@ -22,6 +22,8 @@ public class GroovyConnectorTest {
         _startListenerScript = new String(Files.readAllBytes(Paths.get("./src/test/startListener.groovy")));
         _stopListenerScript = new String(Files.readAllBytes(Paths.get("./src/test/stopListener.groovy")));
         String testScriptText = new String(Files.readAllBytes(Paths.get("./src/test/operationTest.groovy")));
+//        run(testScriptText);
+        testScriptText = new String(Files.readAllBytes(Paths.get("./src/test/browseOpenAPITest.groovy")));
         run(testScriptText);
         
 //        testScriptText = new String(Files.readAllBytes(Paths.get("./src/test/BrowseTest.groovy")));
@@ -39,9 +41,10 @@ public class GroovyConnectorTest {
       //    groovyCompilerConfiguration.setScriptBaseClass();
       GroovyShell shell = new GroovyShell(binding, groovyCompilerConfiguration);
       Map<String, Object> connectionProperties = new HashMap<String, Object>();
-      connectionProperties.put("executeOperation.groovy", _executeOperationScript);
-      connectionProperties.put("startListener.groovy", _startListenerScript);
-      connectionProperties.put("stopListener.groovy", _stopListenerScript);
+//      connectionProperties.put("executeOperation.groovy", _executeOperationScript);
+//      connectionProperties.put("startListener.groovy", _startListenerScript);
+//      connectionProperties.put("stopListener.groovy", _stopListenerScript);
+    connectionProperties.put("spec.groovy", _executeOperationScript);
       binding.setProperty("connectionProperties", connectionProperties);
       Script script = shell.parse(testScriptText);
       script.setBinding(binding);

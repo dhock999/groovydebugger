@@ -30,8 +30,8 @@ public class SocketThread implements Runnable {
 			String line;
 			while (!_doStop) {
 				println "*** Waiting for message";
-				Thread.sleep(60000);
 				_listener.submit(PayloadUtil.toPayload("Hello from a Groovy Listener"));
+				Thread.sleep(60000);
 				println "submit complete...looping"
 			}
 		} catch (Exception e) {

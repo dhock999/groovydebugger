@@ -39,10 +39,9 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("data", data);
-            _binding.setVariable("headers", headers);
             if (_stdoutHandler!=null)
             	_stdoutHandler.setScriptName(scriptName);
-           GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+           headers.add((Entry<String, String>) GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText));
         }
         return headers;
     }
@@ -55,10 +54,9 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("data", data);
-            _binding.setVariable("entity", entity);
             if (_stdoutHandler!=null)
             	_stdoutHandler.setScriptName(scriptName);
-            GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+            entity = (HttpEntity) GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         }
       return entity;
     }

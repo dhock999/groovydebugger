@@ -39,6 +39,7 @@ public class GroovyExecuteOperation extends BaseUpdateOperation {
         String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
         if (StringUtil.isNotBlank(scriptText))
         {
+        	setRedirectDebugLogger(_debugLogWriter);
             if (_stdoutHandler!=null)
             	_stdoutHandler.setScriptName(scriptName);
             if (_debugLogWriter!=null)
@@ -52,9 +53,12 @@ public class GroovyExecuteOperation extends BaseUpdateOperation {
         }
     }
 	public void setRedirectDebugLogger(StringWriter debugLogWriter) {
-		this._debugLogWriter = debugLogWriter;
-		_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
-		_logger.addHandler(_stdoutHandler);
-		_binding.setVariable("out", debugLogWriter);
+		if (debugLogWriter!=null)
+		{
+			this._debugLogWriter = debugLogWriter;
+			_stdoutHandler = new StdOutLoggerHandler(_debugLogWriter);
+			_logger.addHandler(_stdoutHandler);
+			_binding.setVariable("out", debugLogWriter);
+		}
 	}
  }

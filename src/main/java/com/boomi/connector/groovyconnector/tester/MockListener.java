@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import com.boomi.connector.api.Payload;
 import com.boomi.connector.api.PayloadMetadata;
@@ -14,8 +15,10 @@ import com.boomi.connector.api.listen.Listener;
 import com.boomi.connector.api.listen.ListenerExecutionResult;
 import com.boomi.connector.api.listen.PayloadBatch;
 import com.boomi.connector.api.listen.SubmitOptions;
+import com.boomi.connector.groovyconnector.GroovyScriptHelpers;
 
 public class MockListener implements Listener {
+	Logger _logger = Logger.getLogger("MockListener");
 
 	@Override
 	public PayloadMetadata createMetadata() {
@@ -25,14 +28,19 @@ public class MockListener implements Listener {
 
 	@Override
 	public void submit(Payload payload) {
-		// TODO Auto-generated method stub
-		
+		String payloadText="";
+		try {
+			payloadText = GroovyScriptHelpers.inputStreamToString(payload.readFrom());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		_logger.info("submit Payload: " + payloadText);
 	}
 
 	@Override
 	public void submit(Throwable error) {
-		// TODO Auto-generated method stub
-		
+		_logger.info("submit Throwable: " + error.getMessage());
 	}
 
 	@Override

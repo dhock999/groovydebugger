@@ -27,7 +27,7 @@ import groovy.lang.Script;
 public class GroovyRunner {
     private Logger logger;
 
-	String stdout;
+	String stdout="";
 	String actualDocs;
 	DataContextImpl dataContext;
 	String returnDocument="";
@@ -164,7 +164,7 @@ public class GroovyRunner {
 	}
 	
 	public String getStdout() {
-		return stdout;
+		return stdout.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("&", "&amp;");
 	}
 
 	public String getActualDocs() {

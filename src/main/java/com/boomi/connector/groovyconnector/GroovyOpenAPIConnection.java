@@ -31,7 +31,7 @@ public class GroovyOpenAPIConnection extends OpenAPIConnection{
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("spec", spec);
-            GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
+            return (String)GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
         }
         return spec;
     }
