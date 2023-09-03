@@ -4,18 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 import java.util.logging.Logger;
-
 import org.codehaus.groovy.control.CompilerConfiguration;
-
-import com.boomi.connector.api.BrowseContext;
 import com.boomi.connector.api.ConnectorException;
-import com.boomi.connector.api.OperationContext;
-import com.boomi.connector.api.PropertyMap;
-import com.boomi.util.StringUtil;
-
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import com.boomi.util.StreamUtil;
 
 
 public class GroovyScriptHelpers {
@@ -54,15 +48,13 @@ public class GroovyScriptHelpers {
         return error;
     }
     
-    public static String getScript(String scriptName, PropertyMap connectionProperties, Class theClass)
+    public static String getScript(String scriptName)
     {
-        String scriptText = connectionProperties.getProperty(scriptName);
-        if (StringUtil.isBlank(scriptText)) {
-            try {
-                scriptText = GroovyScriptHelpers.readResource(scriptName, theClass);
-            } catch (Exception e) {
-                _logger.info("No script found which is ok if this method wasn't overridden via groovy");
-            }
+        String scriptText = "";
+        try {
+            scriptText = GroovyScriptHelpers.readResource("resources/"+scriptName);
+        } catch (Exception e) {
+            _logger.info("No script found which is ok if this method wasn't overridden via groovy");
         }
         return scriptText;
     }
@@ -88,26 +80,13 @@ public class GroovyScriptHelpers {
         return error;
     }
 
-    public static InputStream getResourceAsStream(String resourcePath, Class theClass) throws Exception
+    public static String readResource(String resourcePath) throws Exception
     {
-        InputStream is = theClass.getClassLoader().getResourceAsStream(resourcePath);
-        return is;
-    }
-
-    public static String inputStreamToString(InputStream is) throws IOException
-    {
-        if (is!=null)
-            try (Scanner scanner = new Scanner(is, "UTF-8")) {
-                return scanner.useDelimiter("\\A").next();
-            }
-        return null;
-    }
-
-    public static String readResource(String resourcePath, Class theClass) throws Exception
-    {
-//        resourcePath = "/"+resourcePath;
-        _logger.info(resourcePath);
-        return inputStreamToString(getResourceAsStream(resourcePath, theClass));
+    	 InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+         if (resource == null) {
+             return null; 
+         }
+         return StreamUtil.toString(resource, "utf-8"); 
     }
     
     public static GroovyShell getShell()

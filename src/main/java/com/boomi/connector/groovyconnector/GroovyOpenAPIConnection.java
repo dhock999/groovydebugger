@@ -27,7 +27,7 @@ public class GroovyOpenAPIConnection extends OpenAPIConnection{
     public String getSpec() {
     	String spec = super.getSpec();
 		String scriptName = "getSpec.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("spec", spec);

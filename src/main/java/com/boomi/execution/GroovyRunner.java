@@ -1,5 +1,7 @@
 package com.boomi.execution;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -143,13 +145,20 @@ public class GroovyRunner {
 	{
 		logger.info("******runConnectorTestMulti " + operationScripts.size());
 		Binding binding = new Binding();
-		Map<String, Object> connectionProperties = new HashMap<String,Object>();
-		for (ConnectorScriptItem item: operationScripts)
-		{
-			connectionProperties.put(item.getName(), item.getScriptText());
-			logger.info("***DEBUGSCRIPT*** " + item.getName() + " " + item.getScriptText());
-		}
-		binding.setProperty("connectionProperties", connectionProperties);
+		
+        Thread.currentThread().setContextClassLoader(new ClassLoader(Thread.currentThread().getContextClassLoader()) {
+            @Override
+            public InputStream getResourceAsStream(String name) {
+                if (name.endsWith(".groovy")) {
+                	for (ConnectorScriptItem item: operationScripts)
+                	{
+                		if (name.endsWith(item.getName())) // may prefix with resources/
+                            return new ByteArrayInputStream(item.getScriptText().getBytes());
+                	}
+                }
+                return super.getResourceAsStream(name);
+            }
+        });
 		runGroovy(binding, testScript);		
 	}
 	
@@ -164,7 +173,7 @@ public class GroovyRunner {
 	}
 	
 	public String getStdout() {
-		return stdout.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("&", "&amp;");
+		return stdout;//.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("&", "&amp;");
 	}
 
 	public String getActualDocs() {

@@ -32,7 +32,7 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 		ObjectTypes objectTypes = null;
 		System.out.println("****getObjectTypes");
 		String scriptName = "getObjectTypes.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             objectTypes = (ObjectTypes) GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);
@@ -47,7 +47,7 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	public ObjectDefinitions getObjectDefinitions(String objectTypeId, Collection<ObjectDefinitionRole> roles) {
 		ObjectDefinitions objectDefinitions = null;
 		String scriptName = "getObjectDefinitions.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("roles", roles);
@@ -65,7 +65,7 @@ public class GroovyBrowser extends BaseBrowser implements ConnectionTester {
 	@Override
 	public void testConnection() {
 		String scriptName = "testConnection.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             if (_stdoutHandler!=null)

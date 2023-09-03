@@ -35,7 +35,7 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
     protected Iterable<Map.Entry<String,String>> getHeaders(ObjectData data) {
         String scriptName = "getHeaders.groovy";
         List<Map.Entry<String,String>> headers = (List<Entry<String, String>>) super.getHeaders(data);
-        String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+        String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("data", data);
@@ -49,7 +49,7 @@ public class GroovyOpenAPIOperation extends OpenAPIOperation {
     @Override
     protected HttpEntity getEntity(ObjectData data) throws IOException {
         String scriptName = "getEntity.groovy";
-        String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+        String scriptText = GroovyScriptHelpers.getScript(scriptName);
         HttpEntity entity = super.getEntity(data);
         if (StringUtil.isNotBlank(scriptText))
         {

@@ -30,7 +30,7 @@ public class StdOutLoggerHandler extends Handler {
 	@Override
 	public void close() throws SecurityException {
 	}
-	
+
 	public void setScriptName(String scriptName)
 	{
 		this.scriptName = scriptName;

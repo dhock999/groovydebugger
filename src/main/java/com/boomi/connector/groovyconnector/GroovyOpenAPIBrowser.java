@@ -34,7 +34,7 @@ public class GroovyOpenAPIBrowser extends OpenAPIBrowser implements ConnectionTe
 	public ObjectTypes getObjectTypes() {
 		ObjectTypes objectTypes = super.getObjectTypes();
 		String scriptName = "filterObjectTypes.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
         	_binding.setVariable("objectTypes", this.getContext());
@@ -48,7 +48,7 @@ public class GroovyOpenAPIBrowser extends OpenAPIBrowser implements ConnectionTe
 	@Override
 	public void testConnection() {
 		String scriptName = "testConnection.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             if (_stdoutHandler!=null)

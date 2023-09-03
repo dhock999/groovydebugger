@@ -36,7 +36,7 @@ public class GroovyExecuteOperation extends BaseUpdateOperation {
         //TODO how do we get this to stdio during test time?
         _logger.info("executeOperation Launching Groovy Script");
         
-        String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+        String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
         	setRedirectDebugLogger(_debugLogWriter);

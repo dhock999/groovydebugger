@@ -29,12 +29,12 @@ public class MockListener implements Listener {
 	@Override
 	public void submit(Payload payload) {
 		String payloadText="";
-		try {
-			payloadText = GroovyScriptHelpers.inputStreamToString(payload.readFrom());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			payloadText = GroovyScriptHelpers.inputStreamToString(payload.readFrom());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		_logger.info("submit Payload: " + payloadText);
 	}
 

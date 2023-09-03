@@ -37,7 +37,7 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
    	@Override
 	public void stop() {
 		String scriptName = "stopListener.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("resources", resources);
@@ -52,7 +52,7 @@ public class GroovyListenOperation extends UnmanagedListenOperation implements S
 	@Override
 	protected void start(Listener listener) {
 		String scriptName = "startListener.groovy";
-	    String scriptText = GroovyScriptHelpers.getScript(scriptName, this.getContext().getConnectionProperties(), this.getClass());
+	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
             _binding.setVariable("resources", resources);

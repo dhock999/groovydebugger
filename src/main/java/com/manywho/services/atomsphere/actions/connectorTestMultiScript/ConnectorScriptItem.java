@@ -7,9 +7,9 @@ import com.manywho.sdk.services.types.Type;
 public class ConnectorScriptItem implements Type{
 	@Type.Identifier
 	private String guid;
-	@Type.Property(name = "Name", contentType = ContentType.String)
+	@Type.Property(name = "scriptName", contentType = ContentType.String)
 	private String name;
-	@Type.Property(name = "Script Text", contentType = ContentType.String)
+	@Type.Property(name = "scriptText", contentType = ContentType.String)
 	private String scriptText;
 
 	public String getGuid() {
