@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<GenericConnectorDescriptor>
+    <operation types="EXECUTE" supportsBrowse="true" customTypeId="good" customTypeLabel="Good!">
+        <field id="name" label="name" type="string">
+            <helpText>This field is included in the output of this connector operation</helpText>
+            <defaultValue>World!</defaultValue>
+        </field>
+    </operation>
+    <operation types="EXECUTE" supportsBrowse="true" customTypeId="bad" customTypeLabel="Bad!">
+        <field id="name" label="name" type="string">
+            <helpText>This field is included in the output of this connector operation</helpText>
+            <defaultValue>World!</defaultValue>
+        </field>
+    </operation>    
+    <operation types="LISTEN" supportsBrowse="true" customTypeId="listen" customTypeLabel="Listen"/>
+</GenericConnectorDescriptor>

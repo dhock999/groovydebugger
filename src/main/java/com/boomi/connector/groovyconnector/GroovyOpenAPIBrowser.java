@@ -37,7 +37,7 @@ public class GroovyOpenAPIBrowser extends OpenAPIBrowser implements ConnectionTe
 	    String scriptText = GroovyScriptHelpers.getScript(scriptName);
         if (StringUtil.isNotBlank(scriptText))
         {
-        	_binding.setVariable("objectTypes", this.getContext());
+        	_binding.setVariable("objectTypes", objectTypes);
             if (_stdoutHandler!=null)
             	_stdoutHandler.setScriptName(scriptName);
             GroovyScriptHelpers.runScript(_shell, _binding, scriptName, scriptText);

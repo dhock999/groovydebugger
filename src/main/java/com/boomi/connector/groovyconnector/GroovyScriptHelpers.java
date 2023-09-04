@@ -20,7 +20,7 @@ public class GroovyScriptHelpers {
         String targetTraceItem = "Script1.groovy:";
         //The groovy line number is in the stackTrace
         //This occurs for SyntaxException etc
-       
+        if (message==null) return message;
         int groovyErrorPosition = message.indexOf(targetTraceItem);
         if (error.length()==0 && groovyErrorPosition>-1)
         {
